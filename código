@@ -28,3 +28,4 @@ for (i in 2:179) {
   estimfactNS<-rbind(estimfactNS, NS)
 }
 stat.desc(estimfactNS)
+#hola
