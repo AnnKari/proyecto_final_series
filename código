@@ -1,0 +1,30 @@
+library(readxl)
+library(pastecs)
+install.packages("YieldCurve")
+library(YieldCurve)
+
+setwd("C:/Users/secun/OneDrive/Documentos/6to/Series de Tiempo/Entrega final")
+yields<-read_excel("datos_2004_2018.xlsx", sheet ="data_complete", col_names = TRUE)
+# colnames(yields)=as.Date(c("2004-01"))
+
+stat.desc(yields)
+
+loadfact2=as.matrix(1-exp(-0.0609*yields$maturity))/(0.0609*yields$maturity)
+loadfact3=as.matrix((1-exp(-0.0609*yields$maturity))/(0.0609*yields$maturity))-exp(-0.0609*yields$maturity)
+
+estimfact=c()
+for (i in 2:179) {
+reg=lm(as.matrix(yields[,i])~loadfact2+loadfact3)
+estimfact<-rbind(estimfact, reg[["coefficients"]])
+}
+summary(reg)
+stat.desc(estimfact)
+
+--------------------------------------------------------
+
+estimfactNS=c()
+for (i in 2:179) {
+  NS<-Nelson.Siegel(yields[,i], yields$maturity)
+  estimfactNS<-rbind(estimfactNS, NS)
+}
+stat.desc(estimfactNS)
