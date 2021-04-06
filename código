@@ -28,4 +28,24 @@ for (i in 2:179) {
   estimfactNS<-rbind(estimfactNS, NS)
 }
 stat.desc(estimfactNS)
-#hola
+
+--------------------------------------------------------
+beta_1=t(yields[120,2:179])
+beta_2=t(yields[120,2:179]-yields[3,2:179])
+beta_3=t(2*yields[24,2:179]-yields[3,2:179]-yields[120,2:179])
+
+re1=as.matrix(beta_1-estimfact[,1])
+re2=as.matrix(beta_2-estimfact[,2])
+re3=as.matrix(beta_3-estimfact[,3])
+
+acf2(re1)#AR1
+acf2(re2)#AR1
+acf2(re3)#AR1
+
+#Pronóstico-----------------
+forecast1()
+for (t in 2:179) {
+  
+pronostico1=sarima.for(beta_1[(t-1),],1,0,0, newxreg =,  n.ahead =1)
+forecast1=(forecast1,pronostico1[["pred"]])
+
