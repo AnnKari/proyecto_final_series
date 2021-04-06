@@ -2,6 +2,7 @@ library(readxl)
 library(pastecs)
 install.packages("YieldCurve")
 library(YieldCurve)
+library(astsa)
 
 setwd("C:/Users/secun/OneDrive/Documentos/6to/Series de Tiempo/Entrega final")
 yields<-read_excel("datos_2004_2018.xlsx", sheet ="data_complete", col_names = TRUE)
@@ -42,10 +43,39 @@ acf2(re1)#AR1
 acf2(re2)#AR1
 acf2(re3)#AR1
 
-#Pronóstico-----------------
-forecast1()
-for (t in 2:179) {
+#Pronóstico -----------------
+#pronóstico a 1 mes (ene 2019)
+for1mbeta_1=sarima.for(beta_1,1,0,0, n.ahead =1)
+for1mbeta_2=sarima.for(beta_2,1,0,0, n.ahead =1)
+for1mbeta_3=sarima.for(beta_3,1,0,0, n.ahead =1)
+
+unidad=c(rep(1,120))
+foryieldm=as.numeric(for1mbeta_1[["pred"]])*unidad+as.numeric(for1mbeta_2[["pred"]])*loadfact2+as.numeric(for1mbeta_3[["pred"]])*loadfact3
+stat.desc(foryiedl1m)
+
+#pronóstico a 6 meses 
+for6mbeta_1=sarima.for(beta_1,1,0,0, n.ahead =6)
+for6mbeta_2=sarima.for(beta_2,1,0,0, n.ahead =6)
+for6mbeta_3=sarima.for(beta_3,1,0,0, n.ahead =6)
+
+foryield6m=matrix(0,120,6)
+for (i in 1:6) {
   
-pronostico1=sarima.for(beta_1[(t-1),],1,0,0, newxreg =,  n.ahead =1)
-forecast1=(forecast1,pronostico1[["pred"]])
+foryield=as.numeric(for6mbeta_1[["pred"]])[i]*unidad+as.numeric(for6mbeta_2[["pred"]])[i]*loadfact2+as.numeric(for6mbeta_3[["pred"]])[i]*loadfact3
+foryield6m[,i]=foryield
+}
+
+#pronóstico a 12 meses 
+for12mbeta_1=sarima.for(beta_1,1,0,0, n.ahead =12)
+for12mbeta_2=sarima.for(beta_2,1,0,0, n.ahead =12)
+for12mbeta_3=sarima.for(beta_3,1,0,0, n.ahead =12)
+
+foryield12m=matrix(0,120,12)
+for (i in 1:12) {
+  
+foryield=as.numeric(for12mbeta_1[["pred"]])[i]*unidad+as.numeric(for12mbeta_2[["pred"]])[i]*loadfact2+as.numeric(for12mbeta_3[["pred"]])[i]*loadfact3
+foryield12m[,i]=foryield
+}
+
+#Prueba de estrés
 
