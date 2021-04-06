@@ -12,11 +12,21 @@ stat.desc(yields)
 loadfact2=as.matrix(1-exp(-0.0609*yields$maturity))/(0.0609*yields$maturity)
 loadfact3=as.matrix((1-exp(-0.0609*yields$maturity))/(0.0609*yields$maturity))-exp(-0.0609*yields$maturity)
 
+Beta_errors=c()
 estimfact=c()
+X=as.matrix(cbind(1,loadfact2,loadfact3))
+
 for (i in 2:179) {
 reg=lm(as.matrix(yields[,i])~loadfact2+loadfact3)
 estimfact<-rbind(estimfact, reg[["coefficients"]])
+
+Y=as.matrix(yields[,i]) #holi
+Beta_hat <- solve(t(X)%*%X, t(X)%*%Y) #estimamos los coeficientes  
+dSigmaSq <- sum((Y - X%*%Beta_hat)^2)/(nrow(X)-ncol(X)) 
+mVarCovar <- dSigmaSq*chol2inv(chol(t(X)%*%X))#matriz de covarianzas
+Beta_errors=c(Beta_errors, diag(mVarCovar)) #errores de beta
 }
+
 summary(reg)
 stat.desc(estimfact)
 
