@@ -83,75 +83,109 @@ foryield12m[,i]=foryield
 
 # Prueba de estres --------------------------------------------------------
 
-#3 meses
-ypred=c(); ypreds=c()
-e=c(); e_bm=c();
+#169 dic 2017 yields 
+#133:168 ene 2015:dic2017 betas_
 
-for (t in seq(132, 178, by = 3)) {
-    
-    for12mbeta_1=sarima.for(beta_1[1:t],1,0,0, n.ahead =3)
-    
-    ypred=as.numeric(for12mbeta_1[["pred"]])
-    ypreds=rbind(ypreds, ypred)
-    
-    error<-((as.numeric(beta_1[(t+1):(t+3)])-as.numeric(for12mbeta_1[["pred"]]))^2)
-    e<-rbind(e,error)
-    
-    #Benchmark
-    benchmark=sarima.for(estimfact[,1], 1,0,0, n.ahead = 3)
-    error<-((as.numeric(beta_1[(t+1):(t+3)])-as.numeric(benchmark[["pred"]]))^2)
-    e_bm=rbind(e_bm,error)
+#horizonte de pronóstico:3 meses-----------
+e=matrix()
+for (t in 133:168) {
+#t=134 
+pronostico1=sarima.for(beta_1[1:(t-1),],1,0,0, n.ahead =3)
+#prueba3mbeta_1=c(prueba3mbeta_1, pronostico1[["pred"]])
+
+pronostico2=sarima.for(beta_2[1:(t-1),],1,0,0, n.ahead =3)
+#prueba3mbeta_2=c(prueba3mbeta_2, pronostico2[["pred"]])
+
+pronostico3=sarima.for(beta_3[1:(t-1),],1,0,0, n.ahead =3)
+#prueba3mbeta_3=c(prueba3mbeta_3, pronostico3[["pred"]])
+
+#forbetas=rbind(as.numeric(pronostico1[["pred"]]),as.numeric(pronostico2[["pred"]]),as.numeric(pronostico3[["pred"]]))
+
+for (i in 1:3) {
+#i=1 
+pronostico_yield=as.numeric(as.numeric(pronostico1[["pred"]])[i]*unidad+as.numeric(pronostico2[["pred"]])[i]*loadfact2+as.numeric(pronostico3[["pred"]])[i]*loadfact3)
+#pronostico_yield3m[,i]=pronostico_yield
+error<-((yields[,(t+i)]-pronostico_yield)^2)
+e<-cbind(e,error)
+}
+}
+                         
+# error<-((as.numeric(beta_1[t:(t+2)])-as.numeric(pronostico1[["pred"]]))^2)
+# e<-c(e,error)
+#Promedio de los errores 
+mean=c()
+for (i in 1:120) {
+m<-mean(as.numeric(e[i,2:109]))
+mean=rbind(mean,m)
+}
+colnames(mean)="promedio_3m"
+
+#horizonte de pronóstico:6 meses-------------
+e=matrix()
+for (t in 133:168) {
+  #t=134 
+  pronostico1=sarima.for(beta_1[1:(t-1),],1,0,0, n.ahead =6)
+  #prueba3mbeta_1=c(prueba3mbeta_1, pronostico1[["pred"]])
+  
+  pronostico2=sarima.for(beta_2[1:(t-1),],1,0,0, n.ahead =6)
+  #prueba3mbeta_2=c(prueba3mbeta_2, pronostico2[["pred"]])
+  
+  pronostico3=sarima.for(beta_3[1:(t-1),],1,0,0, n.ahead =6)
+  #prueba3mbeta_3=c(prueba3mbeta_3, pronostico3[["pred"]])
+  
+  #forbetas=rbind(as.numeric(pronostico1[["pred"]]),as.numeric(pronostico2[["pred"]]),as.numeric(pronostico3[["pred"]]))
+  
+  for (i in 1:6) {
+    #i=1 
+    pronostico_yield=as.numeric(as.numeric(pronostico1[["pred"]])[i]*unidad+as.numeric(pronostico2[["pred"]])[i]*loadfact2+as.numeric(pronostico3[["pred"]])[i]*loadfact3)
+    #pronostico_yield3m[,i]=pronostico_yield
+    error<-((yields[,(t+i)]-pronostico_yield)^2)
+    e<-cbind(e,error)
+  }
 }
 
-colMeans(as.matrix(na.omit(e))) #MSE
+# error<-((as.numeric(beta_1[t:(t+2)])-as.numeric(pronostico1[["pred"]]))^2)
+# e<-c(e,error)
+#Promedio de los errores 
+mean=c()
+for (i in 1:120) {
+  m<-mean(as.numeric(e[i,2:207]))
+  mean=rbind(mean,m)
+}
+colnames(mean)="promedio"
 
-mse<-cbind(e,e_bm)
-
-colMeans(na.omit(mse))
-
-#6 meses
-ypred5=c(); ypreds5=c()
-e5=c(); e_bm5=c();
-
-for (t in seq(132, 178, by = 6)) {
+#horizonte de pronóstico:12 meses-----------
+#hasta nov 2017 porque tenemos datos de 2018 hasta oct
+e=matrix()
+for (t in 133:167) {
+  t=13
+  pronostico1=sarima.for(beta_1[1:(t-1),],1,0,0, n.ahead =12)
+  #prueba3mbeta_1=c(prueba3mbeta_1, pronostico1[["pred"]])
   
-  for12mbeta_1=sarima.for(beta_1[1:t],1,0,0, n.ahead =6)
+  pronostico2=sarima.for(beta_2[1:(t-1),],1,0,0, n.ahead =12)
+  #prueba3mbeta_2=c(prueba3mbeta_2, pronostico2[["pred"]])
   
-  ypred=as.numeric(for12mbeta_1[["pred"]])
-  ypreds=c(ypreds, ypred)
+  pronostico3=sarima.for(beta_3[1:(t-1),],1,0,0, n.ahead =12)
+  #prueba3mbeta_3=c(prueba3mbeta_3, pronostico3[["pred"]])
   
-  error5<-((as.numeric(beta_1[(t+1):(t+6)])-as.numeric(for12mbeta_1[["pred"]]))^2)
-  e5<-rbind(e5,error5)
-  #Benchmark
-  benchmark=sarima.for(estimfact[,1], 1,0,0, n.ahead = 6)
-  error5<-((as.numeric(beta_1[(t+1):(t+6)])-as.numeric(benchmark[["pred"]]))^2)
-  e_bm5=rbind(e_bm5,error5)
+  #forbetas=rbind(as.numeric(pronostico1[["pred"]]),as.numeric(pronostico2[["pred"]]),as.numeric(pronostico3[["pred"]]))
+  
+  for (i in 1:12) {
+    i=1 
+    pronostico_yield=as.numeric(as.numeric(pronostico1[["pred"]])[i]*unidad+as.numeric(pronostico2[["pred"]])[i]*loadfact2+as.numeric(pronostico3[["pred"]])[i]*loadfact3)
+    #pronostico_yield3m[,i]=pronostico_yield
+    error<-((yields[,(t+i)]-pronostico_yield)^2)
+    e<-cbind(e,error)
+  }
 }
 
-colMeans(as.matrix(na.omit(e5))) #MSE
-mse6<-cbind(e5,e_bm5)
-colMeans(na.omit(mse6))
-
-#12 meses
-ypred12=c(); ypreds12=c()
-e12=c(); e_bm12=c();
-
-for (t in seq(132, 178, by = 12)) {
-  
-  for12mbeta_1=sarima.for(beta_1[1:t],1,0,0, n.ahead =12)
-  
-  ypred=as.numeric(for12mbeta_1[["pred"]])
-  ypreds=c(ypreds, ypred)
-  
-  error12<-((as.numeric(beta_1[(t+1):(t+12)])-as.numeric(for12mbeta_1[["pred"]]))^2)
-  e12<-rbind(e12,error12)
-  #Benchmark
-  benchmark=sarima.for(estimfact[,1], 1,0,0, n.ahead = 12)
-  error12<-((as.numeric(beta_1[(t+1):(t+12)])-as.numeric(benchmark[["pred"]]))^2)
-  e_bm12=rbind(e_bm12,error12)
+# error<-((as.numeric(beta_1[t:(t+2)])-as.numeric(pronostico1[["pred"]]))^2)
+# e<-c(e,error)
+#Promedio de los errores 
+mean=c()
+for (i in 1:120) {
+  m<-mean(as.numeric(e[i,2:421]))
+  mean=rbind(mean,m)
 }
-
-colMeans(as.matrix(na.omit(e12))) #MSE
-mse12<-cbind(e12,e_bm12)
-colMeans(na.omit(mse12))
+colnames(mean)="promedio"
 
