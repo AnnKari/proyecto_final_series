@@ -3,6 +3,7 @@ library(pastecs)
 install.packages("YieldCurve")
 library(YieldCurve)
 library(astsa)
+library(tidyverse) #Para poder usar dplyr
 
 setwd("C:/Users/secun/OneDrive/Documentos/6to/Series de Tiempo/Entrega final")
 yields<-read_excel("datos_2004_2018.xlsx", sheet ="data_complete", col_names = TRUE)%>% 
