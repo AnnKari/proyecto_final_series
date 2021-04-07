@@ -81,5 +81,77 @@ foryield=as.numeric(for12mbeta_1[["pred"]])[i]*unidad+as.numeric(for12mbeta_2[["
 foryield12m[,i]=foryield
 }
 
-#Prueba de estrés
+# Prueba de estres --------------------------------------------------------
+
+#3 meses
+ypred=c(); ypreds=c()
+e=c(); e_bm=c();
+
+for (t in seq(132, 178, by = 3)) {
+    
+    for12mbeta_1=sarima.for(beta_1[1:t],1,0,0, n.ahead =3)
+    
+    ypred=as.numeric(for12mbeta_1[["pred"]])
+    ypreds=rbind(ypreds, ypred)
+    
+    error<-((as.numeric(beta_1[(t+1):(t+3)])-as.numeric(for12mbeta_1[["pred"]]))^2)
+    e<-rbind(e,error)
+    
+    #Benchmark
+    benchmark=sarima.for(estimfact[,1], 1,0,0, n.ahead = 3)
+    error<-((as.numeric(beta_1[(t+1):(t+3)])-as.numeric(benchmark[["pred"]]))^2)
+    e_bm=rbind(e_bm,error)
+}
+
+colMeans(as.matrix(na.omit(e))) #MSE
+
+mse<-cbind(e,e_bm)
+
+colMeans(na.omit(mse))
+
+#5 meses
+ypred5=c(); ypreds5=c()
+e5=c(); e_bm5=c();
+
+for (t in seq(132, 178, by = 6)) {
+  
+  for12mbeta_1=sarima.for(beta_1[1:t],1,0,0, n.ahead =6)
+  
+  ypred=as.numeric(for12mbeta_1[["pred"]])
+  ypreds=c(ypreds, ypred)
+  
+  error5<-((as.numeric(beta_1[(t+1):(t+6)])-as.numeric(for12mbeta_1[["pred"]]))^2)
+  e5<-rbind(e5,error5)
+  #Benchmark
+  benchmark=sarima.for(estimfact[,1], 1,0,0, n.ahead = 6)
+  error5<-((as.numeric(beta_1[(t+1):(t+6)])-as.numeric(benchmark[["pred"]]))^2)
+  e_bm5=rbind(e_bm5,error5)
+}
+
+colMeans(as.matrix(na.omit(e5))) #MSE
+mse6<-cbind(e5,e_bm5)
+colMeans(na.omit(mse6))
+
+#12 meses
+ypred12=c(); ypreds12=c()
+e12=c(); e_bm12=c();
+
+for (t in seq(132, 178, by = 12)) {
+  
+  for12mbeta_1=sarima.for(beta_1[1:t],1,0,0, n.ahead =12)
+  
+  ypred=as.numeric(for12mbeta_1[["pred"]])
+  ypreds=c(ypreds, ypred)
+  
+  error12<-((as.numeric(beta_1[(t+1):(t+12)])-as.numeric(for12mbeta_1[["pred"]]))^2)
+  e12<-rbind(e12,error12)
+  #Benchmark
+  benchmark=sarima.for(estimfact[,1], 1,0,0, n.ahead = 12)
+  error12<-((as.numeric(beta_1[(t+1):(t+12)])-as.numeric(benchmark[["pred"]]))^2)
+  e_bm12=rbind(e_bm12,error12)
+}
+
+colMeans(as.matrix(na.omit(e12))) #MSE
+mse12<-cbind(e12,e_bm12)
+colMeans(na.omit(mse12))
 
