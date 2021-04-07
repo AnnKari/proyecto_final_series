@@ -109,7 +109,7 @@ mse<-cbind(e,e_bm)
 
 colMeans(na.omit(mse))
 
-#5 meses
+#6 meses
 ypred5=c(); ypreds5=c()
 e5=c(); e_bm5=c();
 
