@@ -5,7 +5,10 @@ library(YieldCurve)
 library(astsa)
 
 setwd("C:/Users/secun/OneDrive/Documentos/6to/Series de Tiempo/Entrega final")
-yields<-read_excel("datos_2004_2018.xlsx", sheet ="data_complete", col_names = TRUE)
+yields<-read_excel("datos_2004_2018.xlsx", sheet ="data_complete", col_names = TRUE)%>% 
+  setNames(., c('id', format(as.Date(as.numeric(names(.)[-1]), 
+                                     origin = '1899-12-30'), '%m/%d/%Y'))) #Columnas con formato de fecha
+
 # colnames(yields)=as.Date(c("2004-01"))
 
 stat.desc(yields)
