@@ -155,3 +155,22 @@ colMeans(as.matrix(na.omit(e12))) #MSE
 mse12<-cbind(e12,e_bm12)
 colMeans(na.omit(mse12))
 
+# Benchmark Random Walk ---------------------------------------------------
+
+#3 meses
+mat=c(3,12,36,60,120)
+e<-c()
+errorw<-c()
+meanw<-c()
+yieldsw<-yields[,179]
+for(i in mat){
+  errorw=c()
+  for ( t in 134:178){ 
+    #t=134 
+    #i=3
+    e=as.numeric(yields[i, t] - yieldsw[i,])
+    errorw<-c(e, errorw)
+  }
+  meanw=as.matrix(meanw,mean(errorw))
+}
+
