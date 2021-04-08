@@ -1,16 +1,14 @@
 library(readxl)
 library(pastecs)
-install.packages("YieldCurve")
+#install.packages("YieldCurve")
 library(YieldCurve)
 library(astsa)
-library(tidyverse) #Para poder usar dplyr
+library(tidyverse)
 
 setwd("C:/Users/secun/OneDrive/Documentos/6to/Series de Tiempo/Entrega final")
-yields<-read_excel("datos_2004_2018.xlsx", sheet ="data_complete", col_names = TRUE)%>% 
-  setNames(., c('maturity', format(as.Date(as.numeric(names(.)[-1]), 
-                                     origin = '1899-12-30'), '%m/%d/%Y'))) #Columnas con formato de fecha
-
-# colnames(yields)=as.Date(c("2004-01"))
+yields<-read_excel("datos_2004_2018.xlsx", sheet ="data_complete", col_names = TRUE) #%>% 
+  # setNames(., c('id', format(as.Date(as.numeric(names(.)[-1]), 
+  #                                    origin = '1899-12-30'), '%m/%d/%Y'))) #Columnas con formato de fec
 
 stat.desc(yields)
 
@@ -22,11 +20,10 @@ for (i in 2:179) {
 reg=lm(as.matrix(yields[,i])~loadfact2+loadfact3)
 estimfact<-rbind(estimfact, reg[["coefficients"]])
 }
-summary(reg)
 stat.desc(estimfact)
 
 --------------------------------------------------------
-
+#Para comparar resultados
 estimfactNS=c()
 for (i in 2:179) {
   NS<-Nelson.Siegel(yields[,i], yields$maturity)
@@ -34,7 +31,7 @@ for (i in 2:179) {
 }
 stat.desc(estimfactNS)
 
---------------------------------------------------------
+#Residuos de las betas--------------------------------------------------------
 beta_1=t(yields[120,2:179])
 beta_2=t(yields[120,2:179]-yields[3,2:179])
 beta_3=t(2*yields[24,2:179]-yields[3,2:179]-yields[120,2:179])
@@ -57,7 +54,7 @@ unidad=c(rep(1,120))
 foryieldm=as.numeric(for1mbeta_1[["pred"]])*unidad+as.numeric(for1mbeta_2[["pred"]])*loadfact2+as.numeric(for1mbeta_3[["pred"]])*loadfact3
 stat.desc(foryiedl1m)
 
-#pronóstico a 6 meses 
+#pronóstico a 6 meses (ene 2019-jun2019)
 for6mbeta_1=sarima.for(beta_1,1,0,0, n.ahead =6)
 for6mbeta_2=sarima.for(beta_2,1,0,0, n.ahead =6)
 for6mbeta_3=sarima.for(beta_3,1,0,0, n.ahead =6)
@@ -69,7 +66,7 @@ foryield=as.numeric(for6mbeta_1[["pred"]])[i]*unidad+as.numeric(for6mbeta_2[["pr
 foryield6m[,i]=foryield
 }
 
-#pronóstico a 12 meses 
+#pronóstico a 12 meses (ene 2019-dic2019)
 for12mbeta_1=sarima.for(beta_1,1,0,0, n.ahead =12)
 for12mbeta_2=sarima.for(beta_2,1,0,0, n.ahead =12)
 for12mbeta_3=sarima.for(beta_3,1,0,0, n.ahead =12)
@@ -81,7 +78,7 @@ foryield=as.numeric(for12mbeta_1[["pred"]])[i]*unidad+as.numeric(for12mbeta_2[["
 foryield12m[,i]=foryield
 }
 
-# Prueba de estres --------------------------------------------------------
+#Prueba de estrés--------------------------
 
 #169 dic 2017 yields 
 #133:168 ene 2015:dic2017 betas_
@@ -149,7 +146,7 @@ for (t in 133:168) {
 #Promedio de los errores 
 mean=c()
 for (i in 1:120) {
-  m<-mean(as.numeric(e[i,2:207]))
+  m<-mean(as.numeric(e[i,2:217]))
   mean=rbind(mean,m)
 }
 colnames(mean)="promedio"
@@ -189,3 +186,28 @@ for (i in 1:120) {
 }
 colnames(mean)="promedio"
 
+
+#benchmark AR(1)
+
+e=matrix(0,120,102)#108
+#e=c()
+for (i in 1:120) {
+#i=2
+for (t in 136:169) {#134:169, no funciona para 134 y 135
+
+forbenchmark=sarima.for(t(yields[i,2:(t-1)]),1,0,0, n.ahead = 3)
+for (n in 1:3) {
+ 
+error<-as.numeric(((yields[i,(t-1+n)]-as.numeric(forbenchmark[["pred"]])[n])^2))
+#e-c(e,error)
+e[i,]=cbind(error,error)
+}
+}
+}
+
+mean=c()
+for (i in 1:120) {
+  m<-mean(as.numeric(e[i,2:102]))
+  mean=rbind(mean,m)
+}
+colnames(mean)="promedio"
