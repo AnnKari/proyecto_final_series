@@ -157,6 +157,9 @@ colMeans(na.omit(mse12))
 
 # Benchmark Random Walk ---------------------------------------------------
 
+
+# Benchmark Random Walk ---------------------------------------------------
+
 #3 meses
 mat=c(3,12,36,60,120)
 e<-c()
@@ -168,9 +171,15 @@ for(i in mat){
   for ( t in 134:178){ 
     #t=134 
     #i=3
-    e=as.numeric(yields[i, t] - yieldsw[i,])
+    e=(as.numeric(yields[i, t] - yieldsw[i,]))^2
     errorw<-c(e, errorw)
   }
-  meanw=as.matrix(meanw,mean(errorw))
+  meanw=rbind(meanw,mean(errorw))
 }
+meanw
 
+library(stargazer)
+mse=cbind(as.matrix(mean[mat]),as.matrix(mean6[mat]),as.matrix(mean12[mat]),means,means6,means12,meanw)
+colnames(mse)=c("3 Meses", "6 Meses", "12 Meses", "3 Meses Benchmark", "6 Meses Benchmark", "12 Meses Benchmark" , "Random Walk")
+rownames(mse)=c(mat)
+stargazer(mse)
